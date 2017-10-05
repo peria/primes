@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
   std::unique_ptr<PrimeGeneratorBase> generator;
   const int64 x = 100000000;
-  generator.reset(new PrimeGenerator0(x));
+  generator.reset(new PrimeGenerator1(x));
   {
     StopWatch stop_watch;
     generator->sieve();
