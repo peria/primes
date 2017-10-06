@@ -7,11 +7,10 @@
 // Generate prime numbers up to x.
 class PrimeGenerator0 final : public PrimeGeneratorBase {
  public:
-  PrimeGenerator0(int64 x);
-  void sieve() override;
+  void generate(int64 x) override;
   int64 count() override;
+  int32 version() override { return 0; }
 
  private:
-  const int64 x_;
   std::vector<bool> flags_;
 };

@@ -4,6 +4,7 @@
 
 class PrimeGeneratorBase {
  public:
-  virtual void sieve() = 0;
+  virtual void generate(int64 x) = 0;
   virtual int64 count() = 0;
+  virtual int32 version() = 0;
 };

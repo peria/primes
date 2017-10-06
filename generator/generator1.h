@@ -8,11 +8,10 @@
 // Do not handle even numbers.
 class PrimeGenerator1 final : public PrimeGeneratorBase {
  public:
-  PrimeGenerator1(int64 x);
-  void sieve() override;
+  void generate(int64 x) override;
   int64 count() override;
+  int32 version() override { return 1; }
 
  private:
-  const int64 x_;
   std::vector<bool> flags_;
 };
