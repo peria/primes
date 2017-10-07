@@ -51,8 +51,9 @@ PrimeGeneratorBase* CreatePrimeGenerator(int version) {
   switch (version) {
     case 0: return new PrimeGenerator0;
     case 1: return new PrimeGenerator1;
+    case 2: return new PrimeGenerator2;
     default:
-      return new PrimeGenerator1;
+      return new PrimeGenerator2;
   }
   return nullptr;
 }
