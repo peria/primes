@@ -13,9 +13,10 @@ class PrimeGenerator3 final : public PrimeGeneratorBase {
   int32 version() override { return 3; }
 
  private:
-  void generateSmall(const uint64 segment_size, uint64 sqrt_xi);
-  void generateCore(uint8* flags, const uint64 size, uint64 sqrt_xi);
+  void generateSmall();
+  void generateCore(uint8* flags, const uint64 size);
 
+  std::vector<uint8> sflags_;
   std::vector<uint8> flags_;
   std::vector<uint32> indecies_;
 };

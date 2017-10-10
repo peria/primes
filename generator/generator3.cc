@@ -53,10 +53,19 @@ const uint64 kSegmentSize = 10000;  // 10kB
 }  // namespace
 
 void PrimeGenerator3::generate(int64 x) {
+  sflags_.clear();
   flags_.clear();
   indecies_.clear();
   if (x > 1000000000)
     return;
+
+  {
+    const uint64 sqrt_x = std::ceil(std::sqrt(x) + 0.1);
+    const uint64 sqrt_xi = sqrt_x / 30 + 1;
+    sflags_.resize(sqrt_xi, 0xff);
+    sflags_[0] = 0xfe;
+    generateSmall();
+  }
 
   {
     int64 size = x / 30 + (x % 30 != 0);
@@ -74,41 +83,38 @@ void PrimeGenerator3::generate(int64 x) {
     flags_[0] = 0xfe;
   }
 
-  const uint64 segment_size = std::min(kSegmentSize, flags_.size());
-  const uint64 sqrt_x = std::ceil(std::sqrt(x) + 0.1);
-  const uint64 sqrt_xi = sqrt_x / 30 + 1;
-  generateSmall(segment_size, sqrt_xi);
-
-  int64 size = flags_.size() - kSegmentSize;
-  for (uint8* segment = flags_.data() + kSegmentSize; size > 0;
-       segment += kSegmentSize, size -= kSegmentSize) {
-    generateCore(segment, std::min<uint64>(size, kSegmentSize), sqrt_xi);
+  {
+    int64 size = flags_.size();
+    for (uint8* segment = flags_.data(); size > 0;
+         segment += kSegmentSize, size -= kSegmentSize) {
+      generateCore(segment, std::min<uint64>(size, kSegmentSize));
+    }
   }
 }
 
-void PrimeGenerator3::generateSmall(const uint64 segment_size, uint64 sqrt_xi) {
-  for (uint64 i = 0; i < sqrt_xi; ++i) {
-    for (uint8 flags = flags_[i]; flags; flags &= flags - 1) {
+void PrimeGenerator3::generateSmall() {
+  for (uint64 i = 0; i < sflags_.size(); ++i) {
+    for (uint8 flags = sflags_[i]; flags; flags &= flags - 1) {
       uint8 lsb = flags & (-flags);
       int ibit = BitToIndex(lsb);
       const int32 m = kMod30[ibit];
       int32 pm = 30 * i + 2 * m;
       uint64 j = i * pm + (m * m) / 30;
       uint64 k = ibit;
-      while (j < segment_size) {
-        flags_[j] &= kMask[ibit][k];
+      indecies_.push_back(((j + kSegmentSize) << 3) | k);
+      while (j < sflags_.size()) {
+        sflags_[j] &= kMask[ibit][k];
         j += i * C1[k] + C0[ibit][k];
         k = (k + 1) & 7;
       }
-      indecies_.push_back((j << 3) | k);
     }
   }
 }
 
-void PrimeGenerator3::generateCore(uint8* flags, const uint64 size, uint64 sqrt_xi) {
+void PrimeGenerator3::generateCore(uint8* flags, const uint64 size) {
   int32 p_index = 0;
-  for (uint64 i = 0; i < sqrt_xi; ++i) {
-    for (uint8 primes = flags_[i]; primes; primes &= primes - 1) {
+  for (uint64 i = 0; i < sflags_.size(); ++i) {
+    for (uint8 primes = sflags_[i]; primes; primes &= primes - 1) {
       uint8 lsb = primes & (-primes);
       int ibit = BitToIndex(lsb);
       const int32 m = kMod30[ibit];
