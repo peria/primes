@@ -53,6 +53,7 @@ PrimeGeneratorBase* CreatePrimeGenerator(int version) {
     case 1: return new PrimeGenerator1;
     case 2: return new PrimeGenerator2;
     case 3: return new PrimeGenerator3;
+    case 4: return new PrimeGenerator4;
     default:
       return new PrimeGenerator3;
   }

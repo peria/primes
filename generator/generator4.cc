@@ -1,4 +1,4 @@
-#include "generator3.h"
+#include "generator4.h"
 
 #include <cmath>
 
@@ -52,12 +52,11 @@ const uint64 kSegmentSize = 10000;  // 10kB
 
 }  // namespace
 
-void PrimeGenerator3::generate(int64 x) {
+void PrimeGenerator4::generate(int64 x) {
   sflags_.clear();
   flags_.clear();
   indecies_.clear();
-  if (x > 10000000000)
-    return;
+  num_primes_ = 0;
 
   {
     const uint64 sqrt_x = std::ceil(std::sqrt(x) + 0.1);
@@ -68,31 +67,33 @@ void PrimeGenerator3::generate(int64 x) {
   }
 
   {
-    int64 size = x / 30 + (x % 30 != 0);
-    flags_.resize(size, 0xff);
-    if (int r = x % 30) {
-      if (r <= 1)       flags_[size - 1] = 0x0;
-      else if (r <= 7)  flags_[size - 1] = 0x1;
-      else if (r <= 11) flags_[size - 1] = 0x3;
-      else if (r <= 13) flags_[size - 1] = 0x7;
-      else if (r <= 17) flags_[size - 1] = 0xf;
-      else if (r <= 19) flags_[size - 1] = 0x1f;
-      else if (r <= 23) flags_[size - 1] = 0x3f;
-      else if (r <= 29) flags_[size - 1] = 0x7f;
-    }
-    flags_[0] = 0xfe;
-  }
+    flags_.resize(kSegmentSize, 0xff);
+    for (int64 size = x / 30 + (x % 30 != 0), offset = 0; size > 0;
+         offset += kSegmentSize, size -= kSegmentSize) {
+      fill(flags_.begin(), flags_.end(), 0xff);
+      if (offset == 0) {
+        flags_[0] = 0xfe;
+      }
+      if (size < static_cast<int64>(kSegmentSize)) {
+        flags_.resize(size);
+        if (int r = x % 30) {
+          if (r <= 1)       flags_[size - 1] = 0x0;
+          else if (r <= 7)  flags_[size - 1] = 0x1;
+          else if (r <= 11) flags_[size - 1] = 0x3;
+          else if (r <= 13) flags_[size - 1] = 0x7;
+          else if (r <= 17) flags_[size - 1] = 0xf;
+          else if (r <= 19) flags_[size - 1] = 0x1f;
+          else if (r <= 23) flags_[size - 1] = 0x3f;
+          else if (r <= 29) flags_[size - 1] = 0x7f;
+        }
+      }
 
-  {
-    int64 size = flags_.size();
-    for (uint8* segment = flags_.data(); size > 0;
-         segment += kSegmentSize, size -= kSegmentSize) {
-      generateCore(segment, std::min<uint64>(size, kSegmentSize));
+      generateCore(offset);
     }
   }
 }
 
-void PrimeGenerator3::generateSmall() {
+void PrimeGenerator4::generateSmall() {
   for (uint64 i = 0; i < sflags_.size(); ++i) {
     for (uint8 flags = sflags_[i]; flags; flags &= flags - 1) {
       uint8 lsb = flags & (-flags);
@@ -111,7 +112,8 @@ void PrimeGenerator3::generateSmall() {
   }
 }
 
-void PrimeGenerator3::generateCore(uint8* flags, const uint64 size) {
+void PrimeGenerator4::generateCore(const int64 /*offset*/) {
+  const uint64 size = flags_.size();
   int32 p_index = 0;
   for (uint64 i = 0; i < sflags_.size(); ++i) {
     for (uint8 primes = sflags_[i]; primes; primes &= primes - 1) {
@@ -122,7 +124,7 @@ void PrimeGenerator3::generateCore(uint8* flags, const uint64 size) {
       uint64 j = (index >> 3) - kSegmentSize;
       uint64 k = index & 7;
       while (j < size) {
-        flags[j] &= kMask[ibit][k];
+        flags_[j] &= kMask[ibit][k];
         j += i * C1[k] + C0[ibit][k];
         k = (k + 1) & 7;
       }
@@ -130,15 +132,15 @@ void PrimeGenerator3::generateCore(uint8* flags, const uint64 size) {
       ++p_index;
     }
   }
+
+  for (uint64 i = 0; i < size / 8; ++i) {
+    num_primes_ += PopCnt(*reinterpret_cast<uint64*>(flags_.data() + i * 8));
+  }
+  for (uint64 i = size / 8 * 8; i < size; ++i) {
+    num_primes_ += PopCnt(flags_[i]);
+  }
 }
 
-int64 PrimeGenerator3::count() {
-  if (flags_.empty())
-    return -1;
-
-  int64 ret = 3;  // count 2, 3, 5
-  for (uint8 f : flags_) {
-    ret += PopCnt(f);
-  }
-  return ret;
+int64 PrimeGenerator4::count() {
+  return num_primes_ + 3;
 }

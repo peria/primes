@@ -52,7 +52,7 @@ const uint8 kMask[][8] = {
 
 void PrimeGenerator2::generate(int64 x) {
   flags_.clear();
-  if (x > 1000000000)
+  if (x > 10000000000)
     return;
 
   int64 size = x / 30 + (x % 30 != 0);
