@@ -5,14 +5,14 @@ LDFLAGS=-lgflags
 SRCS=$(shell ls *.cc)
 OBJS=$(SRCS:.cc=.o)
 
-all: primes
+all: eratosthenes
 
-primes: $(OBJS)
+eratosthenes: $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
-	rm -f *.o primes
+	rm -f *.o eratosthenes
 

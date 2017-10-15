@@ -1,8 +1,8 @@
-#include "generator1.h"
+#include "eratosthenes1.h"
 
 #include <cmath>
 
-void PrimeGenerator1::generate(int64 x) {
+void Eratosthenes1::generate(int64 x) {
   flags_.clear();
   if (x > 1000000000)
     return;
@@ -21,7 +21,7 @@ void PrimeGenerator1::generate(int64 x) {
   }
 }
 
-int64 PrimeGenerator1::count() {
+int64 Eratosthenes1::count() {
   if (flags_.empty())
     return -1;
 

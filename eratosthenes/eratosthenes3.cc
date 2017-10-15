@@ -1,8 +1,6 @@
-#include "generator3.h"
+#include "eratosthenes3.h"
 
 #include <cmath>
-
-#include <iostream>
 
 namespace {
 
@@ -52,7 +50,7 @@ const uint64 kSegmentSize = 10000;  // 10kB
 
 }  // namespace
 
-void PrimeGenerator3::generate(int64 x) {
+void Eratosthenes3::generate(int64 x) {
   sflags_.clear();
   flags_.clear();
   indecies_.clear();
@@ -92,7 +90,7 @@ void PrimeGenerator3::generate(int64 x) {
   }
 }
 
-void PrimeGenerator3::generateSmall() {
+void Eratosthenes3::generateSmall() {
   for (uint64 i = 0; i < sflags_.size(); ++i) {
     for (uint8 flags = sflags_[i]; flags; flags &= flags - 1) {
       uint8 lsb = flags & (-flags);
@@ -111,7 +109,7 @@ void PrimeGenerator3::generateSmall() {
   }
 }
 
-void PrimeGenerator3::generateCore(uint8* flags, const uint64 size) {
+void Eratosthenes3::generateCore(uint8* flags, const uint64 size) {
   int32 p_index = 0;
   for (uint64 i = 0; i < sflags_.size(); ++i) {
     for (uint8 primes = sflags_[i]; primes; primes &= primes - 1) {
@@ -132,7 +130,7 @@ void PrimeGenerator3::generateCore(uint8* flags, const uint64 size) {
   }
 }
 
-int64 PrimeGenerator3::count() {
+int64 Eratosthenes3::count() {
   if (flags_.empty())
     return -1;
 

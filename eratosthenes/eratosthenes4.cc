@@ -1,8 +1,6 @@
-#include "generator4.h"
+#include "eratosthenes4.h"
 
 #include <cmath>
-
-#include <iostream>
 
 namespace {
 
@@ -52,7 +50,7 @@ const uint64 kSegmentSize = 10000;  // 10kB
 
 }  // namespace
 
-void PrimeGenerator4::generate(int64 x) {
+void Eratosthenes4::generate(int64 x) {
   sflags_.clear();
   flags_.clear();
   indecies_.clear();
@@ -93,7 +91,7 @@ void PrimeGenerator4::generate(int64 x) {
   }
 }
 
-void PrimeGenerator4::generateSmall() {
+void Eratosthenes4::generateSmall() {
   for (uint64 i = 0; i < sflags_.size(); ++i) {
     for (uint8 flags = sflags_[i]; flags; flags &= flags - 1) {
       uint8 lsb = flags & (-flags);
@@ -112,7 +110,7 @@ void PrimeGenerator4::generateSmall() {
   }
 }
 
-void PrimeGenerator4::generateCore(const int64 /*offset*/) {
+void Eratosthenes4::generateCore(const int64 /*offset*/) {
   const uint64 size = flags_.size();
   int32 p_index = 0;
   for (uint64 i = 0; i < sflags_.size(); ++i) {
@@ -141,6 +139,6 @@ void PrimeGenerator4::generateCore(const int64 /*offset*/) {
   }
 }
 
-int64 PrimeGenerator4::count() {
+int64 Eratosthenes4::count() {
   return num_primes_ + 3;
 }

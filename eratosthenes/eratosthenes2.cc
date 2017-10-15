@@ -1,8 +1,6 @@
-#include "generator2.h"
+#include "eratosthenes2.h"
 
 #include <cmath>
-
-#include <iostream>
 
 namespace {
 
@@ -50,7 +48,7 @@ const uint8 kMask[][8] = {
 
 }  // namespace
 
-void PrimeGenerator2::generate(int64 x) {
+void Eratosthenes2::generate(int64 x) {
   flags_.clear();
   if (x > 10000000000)
     return;
@@ -85,7 +83,7 @@ void PrimeGenerator2::generate(int64 x) {
   }
 }
 
-int64 PrimeGenerator2::count() {
+int64 Eratosthenes2::count() {
   if (flags_.empty())
     return -1;
 

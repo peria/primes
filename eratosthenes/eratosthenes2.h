@@ -2,11 +2,11 @@
 
 #include <vector>
 #include "base.h"
-#include "generator_base.h"
+#include "eratosthenes.h"
 
 // Generate prime numbers up to x.
 // Do not handle multiples of 2, 3, and 5.
-class PrimeGenerator2 final : public PrimeGeneratorBase {
+class Eratosthenes2 final : public Eratosthenes {
  public:
   void generate(int64 x) override;
   int64 count() override;

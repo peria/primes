@@ -3,7 +3,11 @@
 #include <memory>
 
 #include "base.h"
-#include "generators.h"
+#include "eratosthenes0.h"
+#include "eratosthenes1.h"
+#include "eratosthenes2.h"
+#include "eratosthenes3.h"
+#include "eratosthenes4.h"
 #include "gflags/gflags.h"
 #include "stop_watch.h"
 
@@ -13,7 +17,7 @@ DEFINE_double(time_limit, 5, "Time limit for performance test in sec.");
 
 namespace {
 
-void PerfTest(PrimeGeneratorBase* generator) {
+void PerfTest(Eratosthenes* eratosthenes) {
   const struct {
     int64 x;
     int64 pix;
@@ -23,13 +27,13 @@ void PerfTest(PrimeGeneratorBase* generator) {
     {10000000000, 455052511}, {100000000000, 4118054813},
   };
 
-  std::cout << "Using prime generator version " << generator->version() << ".\n";
+  std::cout << "Running version: " << eratosthenes->version() << "\n";
   for (auto data : test_data) {
     StopWatch stop_watch;
-    generator->generate(data.x);
+    eratosthenes->generate(data.x);
     double t = stop_watch.GetTimeInSec();
 
-    int64 pix = generator->count();
+    int64 pix = eratosthenes->count();
     if (pix < 0) {
       std::cout << "Give up for pi(" << data.x << ")\n";
       break;
@@ -47,15 +51,15 @@ void PerfTest(PrimeGeneratorBase* generator) {
   }
 }
 
-PrimeGeneratorBase* CreatePrimeGenerator(int version) {
+Eratosthenes* CreateEratosthenes(int version) {
   switch (version) {
-    case 0: return new PrimeGenerator0;
-    case 1: return new PrimeGenerator1;
-    case 2: return new PrimeGenerator2;
-    case 3: return new PrimeGenerator3;
-    case 4: return new PrimeGenerator4;
+    case 0: return new Eratosthenes0;
+    case 1: return new Eratosthenes1;
+    case 2: return new Eratosthenes2;
+    case 3: return new Eratosthenes3;
+    case 4: return new Eratosthenes4;
     default:
-      return new PrimeGenerator3;
+      return new Eratosthenes4;
   }
   return nullptr;
 }
@@ -64,18 +68,18 @@ PrimeGeneratorBase* CreatePrimeGenerator(int version) {
 
 int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  std::unique_ptr<PrimeGeneratorBase> generator(CreatePrimeGenerator(FLAGS_generator));
+  std::unique_ptr<Eratosthenes> eratosthenes(CreateEratosthenes(FLAGS_generator));
 
   if (argc < 2) {
-    PerfTest(generator.get());
+    PerfTest(eratosthenes.get());
     return 0;
   }
 
   int64 x = std::strtoll(argv[1], nullptr, 10);
   StopWatch stop_watch;
-  generator->generate(x);
+  eratosthenes->generate(x);
   double t = stop_watch.GetTimeInSec();
-  int64 pix = generator->count();
+  int64 pix = eratosthenes->count();
 
   std::cout << "pi(" << x << ") = " << pix << "\n";
   std::cerr << "Time : " << t << " sec\n";
