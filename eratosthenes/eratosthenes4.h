@@ -13,7 +13,7 @@ class Eratosthenes4 final : public Eratosthenes {
   int32 version() override { return 4; }
 
  private:
-  void generateSmall();
+  void generateSmall(const int64 sqrt_x);
   void generateCore(const int64 offset);
 
   int64 num_primes_ = -1;

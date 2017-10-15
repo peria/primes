@@ -13,13 +13,8 @@ void Eratosthenes3::generate(int64 x) {
   if (x > 10000000000)
     return;
 
-  {
-    const uint64 sqrt_x = std::ceil(std::sqrt(x) + 0.1);
-    const uint64 sqrt_xi = sqrt_x / 30 + 1;
-    sflags_.resize(sqrt_xi, 0xff);
-    sflags_[0] = 0xfe;
-    generateSmall();
-  }
+  const uint64 sqrt_x = std::ceil(std::sqrt(x));
+  generateSmall(sqrt_x);
 
   {
     int64 size = x / 30 + (x % 30 != 0);
@@ -46,8 +41,14 @@ void Eratosthenes3::generate(int64 x) {
   }
 }
 
-void Eratosthenes3::generateSmall() {
-  for (uint64 i = 0; i < sflags_.size(); ++i) {
+void Eratosthenes3::generateSmall(const int64 sqrt_x) {
+  const uint64 sqrt_xi = sqrt_x / 30 + 1;
+  const int64 quart_x = std::ceil(std::sqrt(sqrt_x));
+  const uint64 quart_xi = quart_x / 30 + 1;
+
+  sflags_.resize(sqrt_xi, 0xff);
+  sflags_[0] = 0xfe;
+  for (uint64 i = 0; i < quart_xi; ++i) {
     for (uint8 flags = sflags_[i]; flags; flags &= flags - 1) {
       uint8 lsb = flags & (-flags);
       int ibit = BitToIndex(lsb);
@@ -55,7 +56,6 @@ void Eratosthenes3::generateSmall() {
       int32 pm = 30 * i + 2 * m;
       uint64 j = i * pm + (m * m) / 30;
       uint64 k = ibit;
-      indecies_.push_back(((j + kSegmentSize) << 3) | k);
       while (j < sflags_.size()) {
         sflags_[j] &= kMask[ibit][k];
         j += i * C1[k] + C0[ibit][k];
@@ -63,16 +63,26 @@ void Eratosthenes3::generateSmall() {
       }
     }
   }
+
+  for (uint64 i = 0; i < sflags_.size(); ++i) {
+    for (uint8 flags = sflags_[i]; flags; flags &= flags - 1) {
+      uint8 lsb = flags & (-flags);
+      int ibit = BitToIndex(lsb);
+      const int32 m = kMod30[ibit];
+      uint64 j = i * (30 * i + 2 * m) + (m * m) / 30;
+      indecies_.push_back(((j + kSegmentSize) << 3) | ibit);
+    }
+  }
 }
 
 void Eratosthenes3::generateCore(uint8* flags, const uint64 size) {
-  int32 p_index = 0;
+  auto p_index = indecies_.begin();
   for (uint64 i = 0; i < sflags_.size(); ++i) {
     for (uint8 primes = sflags_[i]; primes; primes &= primes - 1) {
       uint8 lsb = primes & (-primes);
       int ibit = BitToIndex(lsb);
       const int32 m = kMod30[ibit];
-      uint64 index = indecies_[p_index];
+      uint64 index = *p_index;
       uint64 j = (index >> 3) - kSegmentSize;
       uint64 k = index & 7;
       while (j < size) {
@@ -80,7 +90,7 @@ void Eratosthenes3::generateCore(uint8* flags, const uint64 size) {
         j += i * C1[k] + C0[ibit][k];
         k = (k + 1) & 7;
       }
-      indecies_[p_index] = (j << 3) | k;
+      *p_index = (j << 3) | k;
       ++p_index;
     }
   }
