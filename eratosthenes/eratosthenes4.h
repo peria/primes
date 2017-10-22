@@ -20,5 +20,5 @@ class Eratosthenes4 final : public Eratosthenes {
   int64 num_primes_ = -1;
   std::vector<uint8> sflags_;
   std::vector<uint8> flags_;
-  std::vector<uint32> indecies_;
+  std::vector<uint64> indecies_;
 };
