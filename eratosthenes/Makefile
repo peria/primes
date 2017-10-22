@@ -1,5 +1,5 @@
 CXX=clang++
-CXXFLAGS=-O2 -W -std=c++11
+CXXFLAGS=-O2 -W -Wall -std=c++11
 LDFLAGS=-lgflags
 
 SRCS=$(shell ls *.cc)

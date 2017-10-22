@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-void Eratosthenes0::generate(int64 x) {
+void Eratosthenes0::generate(const int64 x) {
   flags_.clear();
   if (x > 100000000)
     return;

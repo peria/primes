@@ -6,7 +6,7 @@ namespace {
 #include "constants.h"
 }  // namespace
 
-void Eratosthenes3::generate(int64 x) {
+void Eratosthenes3::generate(const int64 x) {
   if (x > 10000000000)
     return;
 
@@ -79,7 +79,6 @@ void Eratosthenes3::generateCore(uint8* flags, const uint64 size) {
     for (uint8 primes = sflags_[i]; primes; primes &= primes - 1) {
       uint8 lsb = primes & (-primes);
       int ibit = BitToIndex(lsb);
-      const int32 m = kMod30[ibit];
       uint64 index = *p_index;
       uint64 j = (index >> 3) - kSegmentSize;
       uint64 k = index & 7;

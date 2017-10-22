@@ -8,13 +8,15 @@
 // Segment sieved area, with smaller memory storage.
 class Eratosthenes4 final : public Eratosthenes {
  public:
-  void generate(int64 x) override;
+  void generate(const int64 x) override;
+  void generate(const int64 from, const int64 to) override;
   int64 count() override;
   int32 version() override { return 4; }
 
  private:
-  void initFlags(const int64 x, const int64 offest, const int64 size);
-  void generateSmall(const int64 sqrt_x);
+  void initFlags(const int64 from_rem, const int64 to,
+                 const int64 offest, const int64 size);
+  void generateSmall(const uint64 offset, const int64 sqrt_to);
   void generateCore(const int64 offset);
 
   int64 num_primes_ = -1;

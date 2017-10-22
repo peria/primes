@@ -24,7 +24,7 @@ void PerfTest(Eratosthenes* eratosthenes) {
   } test_data[] = {
     {100, 25}, {1000, 168}, {10000, 1229}, {100000, 9592}, {1000000, 78498},
     {10000000, 664579}, {100000000, 5761455}, {1000000000, 50847534},
-    {10000000000, 455052511}, {100000000000, 4118054813},
+    {10000000000, 455052511},
   };
 
   std::cout << "Running version: " << eratosthenes->version() << "\n";
@@ -43,6 +43,46 @@ void PerfTest(Eratosthenes* eratosthenes) {
       break;
     }
     std::cout << "pi(" << data.x << ") = " << pix
+              << " Time : " << t << " sec\n";
+    if (t > FLAGS_time_limit) {
+      std::cout << "No more try. It will take too long time.\n";
+      break;
+    }
+  }
+}
+
+void PerfTestRange(Eratosthenes* eratosthenes) {
+  if (eratosthenes->version() < 4)
+    return;
+
+  const struct {
+    int64 from;
+    int64 to;
+    int64 primes;
+  } test_data[] = {
+    {100, 1000, 143}, {1000, 10000, 1061}, {10000, 100000, 8363},
+    {100000, 1000000, 68906}, {1000000, 10000000, 586081},
+    {10000000, 100000000, 5096876}, {100000000, 1000000000, 45086079},
+    {1000000000, 10000000000, 404204977}, {1000000000000, 1001000000000, 36190991}
+  };
+
+  std::cout << "Testing range sieve version: " << eratosthenes->version() << "\n";
+  for (auto data : test_data) {
+    StopWatch stop_watch;
+    eratosthenes->generate(data.from, data.to);
+    double t = stop_watch.GetTimeInSec();
+
+    int64 primes = eratosthenes->count();
+    if (primes < 0) {
+      std::cout << "Give up for pi(" << data.from << ", " << data.to << ")\n";
+      break;
+    }
+    if (primes != data.primes) {
+      std::cout << "pi(" << data.from << ", " << data.to << ") = "
+                << primes << " != " << data.primes << "\n";
+      break;
+    }
+    std::cout << "pi(" << data.from << ", " << data.to << ") = " << primes
               << " Time : " << t << " sec\n";
     if (t > FLAGS_time_limit) {
       std::cout << "No more try. It will take too long time.\n";
@@ -72,16 +112,26 @@ int main(int argc, char* argv[]) {
 
   if (argc < 2) {
     PerfTest(eratosthenes.get());
+    PerfTestRange(eratosthenes.get());
     return 0;
   }
 
-  int64 x = std::strtoll(argv[1], nullptr, 10);
+  int64 from = 0;
+  int64 to = std::strtoll(argv[1], nullptr, 10);
+  if (argc > 2) {
+    from = to;
+    to = std::strtoll(argv[2], nullptr, 10);
+  }
   StopWatch stop_watch;
-  eratosthenes->generate(x);
+  eratosthenes->generate(from, to);
   double t = stop_watch.GetTimeInSec();
   int64 pix = eratosthenes->count();
 
-  std::cout << "pi(" << x << ") = " << pix << "\n";
+  if (argc == 2) {
+    std::cout << "pi(" << to << ") = " << pix << "\n";
+  } else {
+    std::cout << "pi(" << from << ", " << to << ") = " << pix << "\n";
+  }
   std::cerr << "Time : " << t << " sec\n";
 
   return 0;
