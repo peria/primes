@@ -7,41 +7,39 @@ namespace {
 }  // namespace
 
 void Eratosthenes3::generate(int64 x) {
-  sflags_.clear();
-  flags_.clear();
-  indecies_.clear();
   if (x > 10000000000)
     return;
 
-  const uint64 sqrt_x = std::ceil(std::sqrt(x));
-  generateSmall(sqrt_x);
-
-  {
-    int64 size = x / 30 + (x % 30 != 0);
-    flags_.resize(size, 0xff);
-    if (int r = x % 30) {
-      if (r <= 1)       flags_[size - 1] = 0x0;
-      else if (r <= 7)  flags_[size - 1] = 0x1;
-      else if (r <= 11) flags_[size - 1] = 0x3;
-      else if (r <= 13) flags_[size - 1] = 0x7;
-      else if (r <= 17) flags_[size - 1] = 0xf;
-      else if (r <= 19) flags_[size - 1] = 0x1f;
-      else if (r <= 23) flags_[size - 1] = 0x3f;
-      else if (r <= 29) flags_[size - 1] = 0x7f;
-    }
-    flags_[0] = 0xfe;
+  generateSmall(std::ceil(std::sqrt(x)));
+  int64 size = x / 30 + (x % 30 != 0);
+  initFlags(x, size);
+  for (uint8* segment = flags_.data(); size > 0;
+       segment += kSegmentSize, size -= kSegmentSize) {
+    generateCore(segment, std::min<uint64>(size, kSegmentSize));
   }
+}
 
-  {
-    int64 size = flags_.size();
-    for (uint8* segment = flags_.data(); size > 0;
-         segment += kSegmentSize, size -= kSegmentSize) {
-      generateCore(segment, std::min<uint64>(size, kSegmentSize));
-    }
+void Eratosthenes3::initFlags(const int64 x, const int64 size) {
+  flags_.clear();
+  flags_.resize(size, 0xff);
+
+  flags_[0] = 0xfe;
+  if (int r = x % 30) {
+    if (r <= 1)       flags_[size - 1] = 0x0;
+    else if (r <= 7)  flags_[size - 1] = 0x1;
+    else if (r <= 11) flags_[size - 1] = 0x3;
+    else if (r <= 13) flags_[size - 1] = 0x7;
+    else if (r <= 17) flags_[size - 1] = 0xf;
+    else if (r <= 19) flags_[size - 1] = 0x1f;
+    else if (r <= 23) flags_[size - 1] = 0x3f;
+    else if (r <= 29) flags_[size - 1] = 0x7f;
   }
 }
 
 void Eratosthenes3::generateSmall(const int64 sqrt_x) {
+  sflags_.clear();
+  indecies_.clear();
+
   const uint64 sqrt_xi = sqrt_x / 30 + 1;
   const int64 quart_x = std::ceil(std::sqrt(sqrt_x));
   const uint64 quart_xi = quart_x / 30 + 1;

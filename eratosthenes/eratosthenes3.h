@@ -13,6 +13,7 @@ class Eratosthenes3 final : public Eratosthenes {
   int32 version() override { return 3; }
 
  private:
+  void initFlags(const int64 x, const int64 size);
   void generateSmall(const int64 sqrt_x);
   void generateCore(uint8* flags, const uint64 size);
 
