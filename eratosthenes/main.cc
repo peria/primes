@@ -8,6 +8,7 @@
 #include "eratosthenes2.h"
 #include "eratosthenes3.h"
 #include "eratosthenes4.h"
+#include "eratosthenes5.h"
 #include "gflags/gflags.h"
 #include "stop_watch.h"
 
@@ -27,7 +28,7 @@ void PerfTest(Eratosthenes* eratosthenes) {
     {10000000000, 455052511},
   };
 
-  std::cout << "Running version: " << eratosthenes->version() << "\n";
+  std::cout << "Test\n";
   for (auto data : test_data) {
     StopWatch stop_watch;
     eratosthenes->generate(data.x);
@@ -44,7 +45,7 @@ void PerfTest(Eratosthenes* eratosthenes) {
     }
     std::cout << "pi(" << data.x << ") = " << pix
               << " Time : " << t << " sec\n";
-    if (t > FLAGS_time_limit) {
+    if (data.x < 10000000000 && t > FLAGS_time_limit) {
       std::cout << "No more try. It will take too long time.\n";
       break;
     }
@@ -63,10 +64,11 @@ void PerfTestRange(Eratosthenes* eratosthenes) {
     {100, 1000, 143}, {1000, 10000, 1061}, {10000, 100000, 8363},
     {100000, 1000000, 68906}, {1000000, 10000000, 586081},
     {10000000, 100000000, 5096876}, {100000000, 1000000000, 45086079},
-    {1000000000, 10000000000, 404204977}, {1000000000000, 1001000000000, 36190991}
+    // 1000*10^9 - 1001*10^9
+    {1000000000000, 1001000000000, 36190991}
   };
 
-  std::cout << "Testing range sieve version: " << eratosthenes->version() << "\n";
+  std::cout << "Testing range sieve\n";
   for (auto data : test_data) {
     StopWatch stop_watch;
     eratosthenes->generate(data.from, data.to);
@@ -98,8 +100,9 @@ Eratosthenes* CreateEratosthenes(int version) {
     case 2: return new Eratosthenes2;
     case 3: return new Eratosthenes3;
     case 4: return new Eratosthenes4;
+    case 5: return new Eratosthenes5;
     default:
-      return new Eratosthenes4;
+      return new Eratosthenes5;
   }
   return nullptr;
 }
@@ -109,8 +112,14 @@ Eratosthenes* CreateEratosthenes(int version) {
 int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   std::unique_ptr<Eratosthenes> eratosthenes(CreateEratosthenes(FLAGS_generator));
+  std::cout << "Eratosthenes version: " << eratosthenes->version() << "\n";
 
   if (argc < 2) {
+    {
+      StopWatch stop_watch;
+      eratosthenes->initialize();
+      std::cout << "initialize: " << stop_watch.GetTimeInSec() << " sec.\n";
+    }
     PerfTest(eratosthenes.get());
     PerfTestRange(eratosthenes.get());
     return 0;

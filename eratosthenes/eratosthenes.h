@@ -4,6 +4,9 @@
 
 class Eratosthenes {
  public:
+  // Set up common tasks independent from input values.
+  virtual void initialize() {}
+
   // Find prime numbers in range [0, x).
   virtual void generate(const int64 x) = 0;
 
