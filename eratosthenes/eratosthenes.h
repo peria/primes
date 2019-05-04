@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include "base.h"
 
 class Eratosthenes {
@@ -11,7 +12,10 @@ class Eratosthenes {
   virtual void generate(const int64 x) = 0;
 
   // Find prime numbers in range [from, to).
-  virtual void generate(const int64 from, const int64 to) = 0;
+  virtual void generate(const int64 from, const int64 to) {
+    assert (from == 0);
+    generate(to);
+  }
 
   // Returns the number of counted prime numbers.
   virtual int64 count() = 0;

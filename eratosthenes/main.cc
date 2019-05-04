@@ -121,7 +121,8 @@ int main(int argc, char* argv[]) {
       std::cout << "initialize: " << stop_watch.GetTimeInSec() << " sec.\n";
     }
     PerfTest(eratosthenes.get());
-    PerfTestRange(eratosthenes.get());
+    if (FLAGS_generator > 4)
+      PerfTestRange(eratosthenes.get());
     return 0;
   }
 
@@ -132,6 +133,7 @@ int main(int argc, char* argv[]) {
     to = std::strtoll(argv[2], nullptr, 10);
   }
   StopWatch stop_watch;
+  eratosthenes->initialize();
   eratosthenes->generate(from, to);
   double t = stop_watch.GetTimeInSec();
   int64 pix = eratosthenes->count();
