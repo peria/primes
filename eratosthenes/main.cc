@@ -104,7 +104,7 @@ Eratosthenes* CreateEratosthenes(int version) {
     case 5: return new Eratosthenes5;
     case 6: return new Eratosthenes6;
     default:
-      return new Eratosthenes5;
+      return new Eratosthenes6;
   }
   return nullptr;
 }
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
       std::cout << "initialize: " << stop_watch.GetTimeInSec() << " sec.\n";
     }
     PerfTest(eratosthenes.get());
-    if (FLAGS_generator > 4)
+    if (eratosthenes->version() >= 4)
       PerfTestRange(eratosthenes.get());
     return 0;
   }

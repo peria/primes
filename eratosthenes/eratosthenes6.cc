@@ -154,7 +154,7 @@ void Eratosthenes6::generateCore(const int64 /*offset*/) {
         k = (k + 1) & 7;
       }
 
-      while (j + i * 28 + 28 < size) {
+      while (j + i * 28 + kMod30[ibit] - 1 < size) {
         flags_[j] &= kMask[ibit][0]; j += i * C1[0] + C0[ibit][0];
         flags_[j] &= kMask[ibit][1]; j += i * C1[1] + C0[ibit][1];
         flags_[j] &= kMask[ibit][2]; j += i * C1[2] + C0[ibit][2];
