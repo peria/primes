@@ -9,6 +9,7 @@
 #include "eratosthenes3.h"
 #include "eratosthenes4.h"
 #include "eratosthenes5.h"
+#include "eratosthenes6.h"
 #include "gflags/gflags.h"
 #include "stop_watch.h"
 
@@ -101,6 +102,7 @@ Eratosthenes* CreateEratosthenes(int version) {
     case 3: return new Eratosthenes3;
     case 4: return new Eratosthenes4;
     case 5: return new Eratosthenes5;
+    case 6: return new Eratosthenes6;
     default:
       return new Eratosthenes5;
   }

@@ -6,10 +6,10 @@ const int32 kMod30[] = {1, 7, 11, 13, 17, 19, 23, 29};
 // n = [   7, 11, 13, 17, 19, 23, 29, 31]
 
 // [n0-m0 for (n0,m0) in zip(n, m)]
-const int C1[] = {6, 4, 2, 4, 2, 4, 6, 2};
+constexpr int C1[] = {6, 4, 2, 4, 2, 4, 6, 2};
 
 // [[m0*n1/30-m0*m1/30 for (n1,m1) in zip(n, m)] for m0 in m]
-const int C0[][8] = {
+constexpr int C0[][8] = {
   {0, 0, 0, 0, 0, 0, 0, 1}, {1, 1, 1, 0, 1, 1, 1, 1},
   {2, 2, 0, 2, 0, 2, 2, 1}, {3, 1, 1, 2, 1, 1, 3, 1},
   {3, 3, 1, 2, 1, 3, 3, 1}, {4, 2, 2, 2, 2, 2, 4, 1},
@@ -17,7 +17,7 @@ const int C0[][8] = {
 };
 
 // [[bitoff(m0*m1%30) for m1 in m] for m0 in m]
-const uint8 kMask[][8] = {
+constexpr uint8 kMask[][8] = {
   {0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f},
   {0xfd, 0xdf, 0xef, 0xfe, 0x7f, 0xf7, 0xfb, 0xbf},
   {0xfb, 0xef, 0xfe, 0xbf, 0xfd, 0x7f, 0xf7, 0xdf},
@@ -28,6 +28,6 @@ const uint8 kMask[][8] = {
   {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe},
 };
 
-const int64 kSievedPrimes[] = {2, 3, 5, 7, 11, 13, 17, 19, 23};
+constexpr int64 kSievedPrimes[] = {2, 3, 5, 7, 11, 13, 17, 19, 23};
 
-const int64 kInitialSize = 7 * 11 * 13 * 17 * 19 * 23;
+constexpr int64 kInitialSize = 7 * 11 * 13 * 17 * 19 * 23;
