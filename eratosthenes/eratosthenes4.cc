@@ -1,7 +1,6 @@
 #include "eratosthenes4.h"
 
 #include <cmath>
-#include <iostream>
 
 namespace {
 #include "constants.h"
