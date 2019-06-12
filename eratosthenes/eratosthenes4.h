@@ -6,18 +6,18 @@
 
 // Generate prime numbers up to x.
 // Segment sieved area, with smaller memory storage.
-class Eratosthenes4 final : public Eratosthenes {
+class Eratosthenes4 : public Eratosthenes {
  public:
   void generate(const int64 x) override;
   void generate(const int64 from, const int64 to) override;
   int64 count() override;
   int32 version() override { return 4; }
 
- private:
-  void initFlags(const int64 from_rem, const int64 to,
-                 const int64 offest, const int64 size);
-  void generateSmall(const uint64 offset, const int64 sqrt_to);
-  void generateCore(const int64 offset);
+ protected:
+  virtual void generateCore(const int64 offset);
+  virtual void initFlags(const int64 from_rem, const int64 to,
+                         const int64 offest, const int64 size);
+  virtual void generateSmall(const uint64 offset, const int64 sqrt_to);
 
   int64 num_primes_ = -1;
   std::vector<uint8> sflags_;

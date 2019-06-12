@@ -27,10 +27,6 @@ void Eratosthenes5::initialize() {
   copy(head, head + kSegmentSize, head + kInitialSize);
 }
 
-void Eratosthenes5::generate(const int64 x) {
-  generate(0, x);
-}
-
 void Eratosthenes5::generate(const int64 from, const int64 to) {
   flags_.clear();
   num_primes_ = 0;
@@ -134,36 +130,4 @@ void Eratosthenes5::generateSmall(const uint64 offset, const int64 sqrt_to) {
       indecies_.push_back(((j - offset) << 3) | jbit);
     }
   }
-}
-
-void Eratosthenes5::generateCore(const int64 /*offset*/) {
-  const uint64 size = flags_.size();
-  auto itr = indecies_.begin();
-  for (uint64 i = 0; i < sflags_.size(); ++i) {
-    for (uint8 primes = sflags_[i]; primes; primes &= primes - 1) {
-      uint8 lsb = primes & (-primes);
-      int ibit = BitToIndex(lsb);
-      uint64 index = *itr;
-      uint64 j = index >> 3;
-      uint64 k = index & 7;
-      while (j < size) {
-        flags_[j] &= kMask[ibit][k];
-        j += i * C1[k] + C0[ibit][k];
-        k = (k + 1) & 7;
-      }
-      *itr = ((j - kSegmentSize) << 3) | k;
-      ++itr;
-    }
-  }
-
-  for (uint64 i = 0; i < size / 8; ++i) {
-    num_primes_ += PopCnt(*reinterpret_cast<uint64*>(flags_.data() + i * 8));
-  }
-  for (uint64 i = size / 8 * 8; i < size; ++i) {
-    num_primes_ += PopCnt(flags_[i]);
-  }
-}
-
-int64 Eratosthenes5::count() {
-  return num_primes_;
 }
