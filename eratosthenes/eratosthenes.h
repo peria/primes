@@ -5,6 +5,10 @@
 
 class Eratosthenes {
  public:
+  static Eratosthenes* Create(int version);
+
+  virtual ~Eratosthenes() = default;
+
   // Set up common tasks independent from input values.
   virtual void initialize() {}
 

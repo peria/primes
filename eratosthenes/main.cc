@@ -3,13 +3,7 @@
 #include <memory>
 
 #include "base.h"
-#include "eratosthenes0.h"
-#include "eratosthenes1.h"
-#include "eratosthenes2.h"
-#include "eratosthenes3.h"
-#include "eratosthenes4.h"
-#include "eratosthenes5.h"
-#include "eratosthenes6.h"
+#include "eratosthenes.h"
 #include "gflags/gflags.h"
 #include "stop_watch.h"
 
@@ -19,7 +13,7 @@ DEFINE_double(time_limit, 5, "Time limit for performance test in sec.");
 
 namespace {
 
-void PerfTest(Eratosthenes* eratosthenes) {
+void PerfTest(Eratosthenes& eratosthenes) {
   const struct {
     int64 x;
     int64 pix;
@@ -32,10 +26,10 @@ void PerfTest(Eratosthenes* eratosthenes) {
   std::cout << "Test\n";
   for (auto data : test_data) {
     StopWatch stop_watch;
-    eratosthenes->generate(data.x);
+    eratosthenes.generate(data.x);
     double t = stop_watch.GetTimeInSec();
 
-    int64 pix = eratosthenes->count();
+    int64 pix = eratosthenes.count();
     if (pix < 0) {
       std::cout << "Give up for pi(" << data.x << ")\n";
       break;
@@ -53,8 +47,8 @@ void PerfTest(Eratosthenes* eratosthenes) {
   }
 }
 
-void PerfTestRange(Eratosthenes* eratosthenes) {
-  if (eratosthenes->version() < 4)
+void PerfTestRange(Eratosthenes& eratosthenes) {
+  if (eratosthenes.version() < 4)
     return;
 
   const struct {
@@ -75,10 +69,10 @@ void PerfTestRange(Eratosthenes* eratosthenes) {
   std::cout << "Testing range sieve\n";
   for (auto data : test_data) {
     StopWatch stop_watch;
-    eratosthenes->generate(data.from, data.to);
+    eratosthenes.generate(data.from, data.to);
     double t = stop_watch.GetTimeInSec();
 
-    int64 primes = eratosthenes->count();
+    int64 primes = eratosthenes.count();
     if (primes < 0) {
       std::cout << "Give up for pi(" << data.from << ", " << data.to << ")\n";
       break;
@@ -97,58 +91,56 @@ void PerfTestRange(Eratosthenes* eratosthenes) {
   }
 }
 
-Eratosthenes* CreateEratosthenes(int version) {
-  switch (version) {
-    case 0: return new Eratosthenes0;
-    case 1: return new Eratosthenes1;
-    case 2: return new Eratosthenes2;
-    case 3: return new Eratosthenes3;
-    case 4: return new Eratosthenes4;
-    case 5: return new Eratosthenes5;
-    case 6: return new Eratosthenes6;
-    default:
-      return new Eratosthenes6;
+void RunPerfTests(Eratosthenes& eratosthenes) {
+  std::cout << "Test and measure performance of eratosthenes version: "
+            << eratosthenes.version() << "\n";
+  {
+    StopWatch stop_watch;
+    eratosthenes.initialize();
+    std::cout << "initialize: " << stop_watch.GetTimeInSec() << " sec.\n";
   }
-  return nullptr;
+  PerfTest(eratosthenes);
+  if (eratosthenes.version() >= 4)
+    PerfTestRange(eratosthenes);
+}
+
+void CountPrimes(Eratosthenes& eratosthenes, int64 from, int64 to) {
+  StopWatch stop_watch;
+  eratosthenes.initialize();
+  eratosthenes.generate(std::max<int64>(from, 0), to);
+  double t = stop_watch.GetTimeInSec();
+  int64 pix = eratosthenes.count();
+
+  if (from < 0) {
+    std::cout << "pi(" << to << ") = " << pix << "\n";
+  } else {
+    std::cout << "pi(" << from << ", " << to << ") = " << pix << "\n";
+  }
+  std::cerr << "Time : " << t << " sec\n";
 }
 
 }  // namespace
 
 int main(int argc, char* argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  std::unique_ptr<Eratosthenes> eratosthenes(CreateEratosthenes(FLAGS_generator));
-  std::cout << "Eratosthenes version: " << eratosthenes->version() << "\n";
-
+  std::unique_ptr<Eratosthenes> eratosthenes(Eratosthenes::Create(FLAGS_generator));
+  if (!eratosthenes) {
+    std::cerr << "Version " << FLAGS_generator << " is not supported\n";
+    return 0;
+  }
+  
   if (argc < 2) {
-    {
-      StopWatch stop_watch;
-      eratosthenes->initialize();
-      std::cout << "initialize: " << stop_watch.GetTimeInSec() << " sec.\n";
-    }
-    PerfTest(eratosthenes.get());
-    if (eratosthenes->version() >= 4)
-      PerfTestRange(eratosthenes.get());
+    RunPerfTests(*eratosthenes);
     return 0;
   }
 
-  int64 from = 0;
+  int64 from = -1;
   int64 to = std::strtoll(argv[1], nullptr, 10);
   if (argc > 2) {
     from = to;
     to = std::strtoll(argv[2], nullptr, 10);
   }
-  StopWatch stop_watch;
-  eratosthenes->initialize();
-  eratosthenes->generate(from, to);
-  double t = stop_watch.GetTimeInSec();
-  int64 pix = eratosthenes->count();
-
-  if (argc == 2) {
-    std::cout << "pi(" << to << ") = " << pix << "\n";
-  } else {
-    std::cout << "pi(" << from << ", " << to << ") = " << pix << "\n";
-  }
-  std::cerr << "Time : " << t << " sec\n";
+  CountPrimes(*eratosthenes, from, to);
 
   return 0;
 }
