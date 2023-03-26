@@ -16,30 +16,30 @@ fn main() {
         let pi = eratosthenes.count();
         println!("pi({}) = {}", x, pi);
     }
-
-    /*
-     std::unique_ptr<Eratosthenes> eratosthenes(Eratosthenes::Create(FLAGS_generator));
-     if (!eratosthenes) {
-       std::cerr << "Version " << FLAGS_generator << " is not supported\n";
-       return 0;
-     }
-
-     if (argc < 2) {
-       RunPerfTests(*eratosthenes);
-       return 0;
-     }
-
-     int64 from = -1;
-     int64 to = std::strtoll(argv[1], nullptr, 10);
-     if (argc > 2) {
-       from = to;
-       to = std::strtoll(argv[2], nullptr, 10);
-     }
-     CountPrimes(*eratosthenes, from, to);
-
-     return 0;
-    */
 }
+
+/*
+ std::unique_ptr<Eratosthenes> eratosthenes(Eratosthenes::Create(FLAGS_generator));
+ if (!eratosthenes) {
+   std::cerr << "Version " << FLAGS_generator << " is not supported\n";
+   return 0;
+ }
+
+ if (argc < 2) {
+   RunPerfTests(*eratosthenes);
+   return 0;
+ }
+
+ int64 from = -1;
+ int64 to = std::strtoll(argv[1], nullptr, 10);
+ if (argc > 2) {
+   from = to;
+   to = std::strtoll(argv[2], nullptr, 10);
+ }
+ CountPrimes(*eratosthenes, from, to);
+
+ return 0;
+*/
 
 /*
 
