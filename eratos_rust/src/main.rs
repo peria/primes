@@ -1,20 +1,55 @@
-mod eratosthenes;
+use std::time::Instant;
 
 gflags::define! {
-    -g, --generator: i32
+    --generator = 0i32
 /*
 DEFINE_int32(generator, -1, "Version of the prime generator to use. "
              "The new one is used by default.");
 DEFINE_double(time_limit, 5, "Time limit for performance test in sec.");
 */
 }
+gflags::define! {
+  --bench = false
+}
 
 fn main() {
-    let mut eratosthenes = eratosthenes::get_eratosthenes(0);
-    for x in [100, 1000, 10000] {
+    let args = gflags::parse();
+
+    if BENCH.flag {
+        benchmark();
+        return;
+    }
+
+    let mut eratosthenes = eratosthenes::get_eratosthenes(GENERATOR.flag);
+    if args.len() > 0 {
+        let x = args[0].parse::<usize>().unwrap();
         eratosthenes.generate(x);
         let pi = eratosthenes.count();
         println!("pi({}) = {}", x, pi);
+    } else {
+        for x in [100, 1000, 10000] {
+            eratosthenes.generate(x);
+            let pi = eratosthenes.count();
+            println!("pi({}) = {}", x, pi);
+        }
+    }
+}
+
+fn benchmark() {
+    for v in 0..=3 {
+        let mut eratosthenes = eratosthenes::get_eratosthenes(v);
+        eprintln!("version: {}", v);
+        for e in 2..10 {
+            let x = 10usize.pow(e);
+            let start = Instant::now();
+            eratosthenes.generate(x);
+            let end = start.elapsed();
+            let pi = eratosthenes.count();
+            eprintln!("pi(10^{:2}) = {:9} {:6.03} sec", e, pi, end.as_secs_f64());
+            if end.as_secs() >= 1 {
+                break;
+            }
+        }
     }
 }
 
@@ -44,40 +79,6 @@ fn main() {
 /*
 
 namespace {
-
-void PerfTest(Eratosthenes& eratosthenes) {
-  const struct {
-    int64 x;
-    int64 pix;
-  } test_data[] = {
-    {100, 25}, {1000, 168}, {10000, 1229}, {100000, 9592}, {1000000, 78498},
-    {10000000, 664579}, {100000000, 5761455}, {1000000000, 50847534},
-    {10000000000, 455052511},
-  };
-
-  std::cout << "Test\n";
-  for (auto data : test_data) {
-    StopWatch stop_watch;
-    eratosthenes.generate(data.x);
-    double t = stop_watch.GetTimeInSec();
-
-    int64 pix = eratosthenes.count();
-    if (pix < 0) {
-      std::cout << "Give up for pi(" << data.x << ")\n";
-      break;
-    }
-    if (pix != data.pix) {
-      std::cout << "pi(" << data.x << ") = " << pix << " != " << data.pix << "\n";
-      break;
-    }
-    std::cout << "pi(" << data.x << ") = " << pix
-              << " Time : " << t << " sec\n";
-    if (data.x < 10000000000 && t > FLAGS_time_limit) {
-      std::cout << "No more try. It will take too long time.\n";
-      break;
-    }
-  }
-}
 
 void PerfTestRange(Eratosthenes& eratosthenes) {
   if (eratosthenes.version() < 4)

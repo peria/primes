@@ -1,26 +1,21 @@
+use crate::bits;
+
 pub struct Eratosthenes0 {
-    flags: Vec<u64>,
+    flags: bits::Bits,
 }
 
 impl super::Eratosthenes for Eratosthenes0 {
     // Finds prime numbers in range [0, x).
     fn generate(&mut self, x: usize) {
-        const FULL_BITS: u64 = !0u64;
-        let n = x / 64 + 1;
-        let mut flags = vec![FULL_BITS; n];
-        // Turn off flags for 0 and 1.
-        flags[0] ^= 3;
-        // Turn off flags for out of the range.
-        flags[n - 1] = (1u64 << ((x + 1) % 64)) - 1;
-        self.flags = flags;
+        self.init(x);
 
         let sq = (x as f64).sqrt() as usize + 1;
         for p in 0..sq {
-            if !self.is_prime(p) {
+            if !self.flags.get(p) {
                 continue;
             }
             for m in (p * p..=x).step_by(p) {
-                self.set_off(m);
+                self.flags.unset(m);
             }
         }
     }
@@ -30,7 +25,7 @@ impl super::Eratosthenes for Eratosthenes0 {
 
     // Returns the number of counted prime numbers.
     fn count(&self) -> i64 {
-        self.flags.iter().map(|x| x.count_ones() as i64).sum()
+        self.flags.bit_count() as i64
     }
 
     // Return the implemented version.
@@ -41,14 +36,17 @@ impl super::Eratosthenes for Eratosthenes0 {
 
 impl Eratosthenes0 {
     pub fn new() -> Eratosthenes0 {
-        Eratosthenes0 { flags: Vec::new() }
+        Eratosthenes0 {
+            flags: bits::Bits::new(1, false),
+        }
     }
 
-    fn is_prime(&self, n: usize) -> bool {
-        (self.flags[n / 64] & (1u64 << (n % 64))) != 0
-    }
-
-    fn set_off(&mut self, n: usize) {
-        self.flags[n / 64] &= !(1u64 << (n % 64));
+    fn init(&mut self, x: usize) {
+        let n = x + 1;
+        let mut bits = bits::Bits::new(n, true);
+        // Turn off flags for 0 and 1.
+        bits.unset(0);
+        bits.unset(1);
+        self.flags = bits;
     }
 }
