@@ -42,7 +42,7 @@ const D: [[u8; 8]; 8] = [
 pub fn get_eratosthenes(version: i32) -> Box<dyn Eratosthenes> {
     match version {
         0 => Box::new(eratosthenes0::Eratosthenes0::new()),
-        // 1 => Box::new(eratosthenes1::Eratosthenes1::new()),
+        1 => Box::new(eratosthenes1::Eratosthenes1::new()),
         // 2 => Box::new(eratosthenes2::Eratosthenes2::new()),
         // 3 => Box::new(eratosthenes3::Eratosthenes3::new()),
         _ => Box::new(eratosthenes0::Eratosthenes0::new()),
@@ -54,23 +54,26 @@ mod tests {
     use super::*;
     use std::time::Instant;
 
+    const GENERATE_TEST_DATA: [(u32, usize); 9] = [
+        (2, 25),
+        (3, 168),
+        (4, 1229),
+        (5, 9592),
+        (6, 78498),
+        (7, 664579),
+        (8, 5761455),
+        (9, 50847534),
+        (10, 455052511),
+    ];
+
     #[test]
     fn generate_test() {
-        for v in 0..=3 {
+        // To see the performance, run `cargo test --release -- --nocapture`
+        for v in 0..=1 {
             let mut eratosthenes = get_eratosthenes(v);
-            let test_data: Vec<(u32, usize)> = vec![
-                (2, 25),
-                (3, 168),
-                (4, 1229),
-                (5, 9592),
-                (6, 78498),
-                (7, 664579),
-                (8, 5761455),
-                (9, 50847534),
-                (10, 455052511),
-            ];
+
             eprintln!("version: {}", v);
-            for (e, expect) in test_data {
+            for &(e, expect) in GENERATE_TEST_DATA.iter() {
                 let x = 10usize.pow(e);
                 let start = Instant::now();
                 eratosthenes.generate(x);
