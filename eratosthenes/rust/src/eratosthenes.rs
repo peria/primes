@@ -1,7 +1,13 @@
+mod eratosthenes;
 mod eratosthenes0;
 mod eratosthenes1;
 mod eratosthenes2;
 mod eratosthenes3;
+mod eratosthenes4;
+mod eratosthenes5;
+mod eratosthenes6;
+
+pub use eratosthenes::Eratosthenes;
 
 const B: [usize; 8] = [1, 7, 11, 13, 17, 19, 23, 29];
 
@@ -33,27 +39,13 @@ const D: [[u8; 8]; 8] = [
     [0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe],
 ];
 
-pub trait Eratosthenes {
-    // Finds prime numbers in range [0, x).
-    fn generate(&mut self, x: usize);
-
-    // Finds prime numbers in range [x, y).
-    fn generate_range(&mut self, x: usize, y: usize);
-
-    // Returns the number of counted prime numbers.
-    fn count(&self) -> i64;
-
-    // Return the implemented version.
-    fn version(&self) -> i32;
-}
-
 pub fn get_eratosthenes(version: i32) -> Box<dyn Eratosthenes> {
     match version {
         0 => Box::new(eratosthenes0::Eratosthenes0::new()),
-        1 => Box::new(eratosthenes1::Eratosthenes1::new()),
-        2 => Box::new(eratosthenes2::Eratosthenes2::new()),
-        3 => Box::new(eratosthenes3::Eratosthenes3::new()),
-        _ => Box::new(eratosthenes2::Eratosthenes2::new()),
+        // 1 => Box::new(eratosthenes1::Eratosthenes1::new()),
+        // 2 => Box::new(eratosthenes2::Eratosthenes2::new()),
+        // 3 => Box::new(eratosthenes3::Eratosthenes3::new()),
+        _ => Box::new(eratosthenes0::Eratosthenes0::new()),
     }
 }
 
@@ -66,7 +58,7 @@ mod tests {
     fn generate_test() {
         for v in 0..=3 {
             let mut eratosthenes = get_eratosthenes(v);
-            let test_data: Vec<(u32, i64)> = vec![
+            let test_data: Vec<(u32, usize)> = vec![
                 (2, 25),
                 (3, 168),
                 (4, 1229),
