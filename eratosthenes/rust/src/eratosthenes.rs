@@ -9,7 +9,7 @@ mod eratosthenes6;
 
 pub use eratosthenes::Eratosthenes;
 
-const B: [usize; 8] = [1, 7, 11, 13, 17, 19, 23, 29];
+const MOD30: [usize; 8] = [1, 7, 11, 13, 17, 19, 23, 29];
 
 // [n0-m0 for (n0,m0) in zip(n, m)]
 const C1: [usize; 8] = [6, 4, 2, 4, 2, 4, 6, 2];
@@ -28,7 +28,7 @@ const C0: [[usize; 8]; 8] = [
 
 // [[bitoff(m0*m1%30) for m1 in m] for m0 in m]
 #[allow(dead_code)]
-const D: [[u8; 8]; 8] = [
+const BIT_MASKS: [[u8; 8]; 8] = [
     [0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f],
     [0xfd, 0xdf, 0xef, 0xfe, 0x7f, 0xf7, 0xfb, 0xbf],
     [0xfb, 0xef, 0xfe, 0xbf, 0xfd, 0x7f, 0xf7, 0xdf],
@@ -43,7 +43,7 @@ pub fn get_eratosthenes(version: i32) -> Box<dyn Eratosthenes> {
     match version {
         0 => Box::new(eratosthenes0::Eratosthenes0::new()),
         1 => Box::new(eratosthenes1::Eratosthenes1::new()),
-        // 2 => Box::new(eratosthenes2::Eratosthenes2::new()),
+        2 => Box::new(eratosthenes2::Eratosthenes2::new()),
         // 3 => Box::new(eratosthenes3::Eratosthenes3::new()),
         _ => Box::new(eratosthenes0::Eratosthenes0::new()),
     }
@@ -69,7 +69,7 @@ mod tests {
     #[test]
     fn generate_test() {
         // To see the performance, run `cargo test --release -- --nocapture`
-        for v in 0..=1 {
+        for v in 0..=2 {
             let mut eratosthenes = get_eratosthenes(v);
 
             eprintln!("version: {}", v);

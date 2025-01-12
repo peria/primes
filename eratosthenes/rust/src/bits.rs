@@ -36,24 +36,30 @@ pub struct Bytes {
 }
 
 impl Bytes {
-    pub fn new(num_bytes: usize, is_filled: bool) -> Bytes {
-        const FULL_BYTES: u8 = !0u8;
-        let val = if is_filled { FULL_BYTES } else { 0 };
+    pub fn new(num_bytes: usize, value: u8) -> Bytes {
         Bytes {
-            bytes: vec![val; num_bytes],
+            bytes: vec![value; num_bytes],
         }
     }
 
-    pub fn set(&mut self, byte_id: usize, bit_id: usize) {
+    pub fn set_byte(&mut self, byte_id: usize, value: u8) {
+        self.bytes[byte_id] = value;
+    }
+
+    pub fn set_bit(&mut self, byte_id: usize, bit_id: usize) {
         self.bytes[byte_id] |= 1u8 << bit_id;
     }
 
-    pub fn unset(&mut self, byte_id: usize, bit_id: usize) {
+    pub fn unset_bit(&mut self, byte_id: usize, bit_id: usize) {
         self.bytes[byte_id] &= !(1u8 << bit_id);
     }
 
     pub fn mask(&mut self, byte_id: usize, mask: u8) {
         self.bytes[byte_id] &= mask;
+    }
+
+    pub fn get_byte(&self, byte_id: usize) -> u8 {
+        self.bytes[byte_id]
     }
 
     pub fn get(&self, byte_id: usize, bit_id: usize) -> bool {
