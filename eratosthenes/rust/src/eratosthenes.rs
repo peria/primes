@@ -9,6 +9,8 @@ mod eratosthenes6;
 
 pub use eratosthenes::Eratosthenes;
 
+const SEGMENT_SIZE: usize = 1000000; // ~1MB
+
 const MOD30: [usize; 8] = [1, 7, 11, 13, 17, 19, 23, 29];
 
 // [n0-m0 for (n0,m0) in zip(n, m)]
@@ -44,7 +46,7 @@ pub fn get_eratosthenes(version: i32) -> Box<dyn Eratosthenes> {
         0 => Box::new(eratosthenes0::Eratosthenes0::new()),
         1 => Box::new(eratosthenes1::Eratosthenes1::new()),
         2 => Box::new(eratosthenes2::Eratosthenes2::new()),
-        // 3 => Box::new(eratosthenes3::Eratosthenes3::new()),
+        3 => Box::new(eratosthenes3::Eratosthenes3::new()),
         _ => Box::new(eratosthenes0::Eratosthenes0::new()),
     }
 }
@@ -69,7 +71,7 @@ mod tests {
     #[test]
     fn generate_test() {
         // To see the performance, run `cargo test --release -- --nocapture`
-        for v in 0..=2 {
+        for v in 0..=3 {
             let mut eratosthenes = get_eratosthenes(v);
 
             eprintln!("version: {}", v);
